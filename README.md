@@ -1,6 +1,6 @@
 # AutoDroid
 
-[![CI](https://github.com/yurikayel/autodroid/actions/workflows/ci.yml/badge.svg)](https://github.com/yurikayel/autodroid/actions/workflows/ci.yml)
+[![CI](https://github.com/yurikayel/autodroid-calm-cockpit/actions/workflows/ci.yml/badge.svg)](https://github.com/yurikayel/autodroid-calm-cockpit/actions/workflows/ci.yml)
 
 A small Android Automotive OS (AAOS) proof of concept: a multi-brand **Calm Cockpit** with live vehicle telemetry, a voice companion, and a radio browser that respects driving restrictions.
 
