@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Relax the hardware requirement so we can test the POC on phone emulators -->
+    <uses-feature android:name="android.hardware.type.automotive" android:required="false" tools:replace="android:required" />
+
+    <application>
+        <uses-library android:name="android.car" android:required="false" tools:replace="android:required" />
+    </application>
+
+</manifest>
