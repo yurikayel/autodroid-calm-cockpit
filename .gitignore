@@ -20,5 +20,6 @@ local.properties
 *.ap_
 *.dex
 .kotlin/
+gradle/gradle-daemon-jvm.properties
 .idea/
 *.hprof
