@@ -1,3 +1,77 @@
-﻿<resources>
+<resources>
     <string name="app_name">AutoDroid</string>
+    <string name="error_network_offline">No internet connection. Showing offline data.</string>
+    <string name="error_network_timeout">The connection timed out. Please try again.</string>
+    <string name="error_network_server">Server error occurred (Code: %1$d). Please try again later.</string>
+    <string name="error_api_rate_limit">You are searching too fast. Please slow down.</string>
+    <string name="error_api_not_found">City not found. Try a different search.</string>
+    <string name="error_unknown">An unknown error occurred. Showing offline data if available.</string>
+
+    <string name="search_hint">Search a city…</string>
+    <string name="sync_error_prefix">Offline Mode: %1$s</string>
+    <string name="error_prefix">Error: %1$s</string>
+    <string name="location_result_format">• %1$s</string>
+    <string name="sync_error_with_warning">⚠ %1$s</string>
+    <string name="clear_search">Clear search</string>
+    <string name="search">Search</string>
+
+    <!-- Home screen -->
+    <string name="home_top_picks_title">Top picks for you</string>
+    <string name="home_top_picks_empty">Connect to the internet to see today\'s suggestions.</string>
+    <string name="home_history_title">Recently viewed</string>
+    <string name="home_history_item_cd">Open %1$s again</string>
+    <string name="theme_switch_to_dark">Switch to dark mode</string>
+    <string name="theme_switch_to_cycle">Switch to cycle mode</string>
+    <string name="theme_switch_to_light">Switch to light mode</string>
+    <string name="theme_cycle_label">CYCLE</string>
+    <string name="home_current_location">Current location · %1$s</string>
+    <string name="home_current_location_cd">Check weather for your current location, %1$s</string>
+
+    <!-- Detail screen -->
+    <string name="detail_back">Back</string>
+    <string name="tab_top_picks">Top Picks</string>
+    <string name="tab_recent">Recent</string>
+    <string name="tab_activities">Activities</string>
+    <string name="week_summary_precip">%1$d mm</string>
+    <string name="week_summary_temp_range_compact">%1$d/%2$d</string>
+    <string name="week_summary_row_cd">%1$s %2$s, high %3$d low %4$d, %5$d mm precipitation</string>
+    <string name="detail_activities_for_day">Best things to do on %1$s</string>
+    <string name="temp_degrees">%1$d</string>
+    <string name="share_weather">Share weather</string>
+    <string name="share_weather_failed">Couldn\'t share the weather card. Please try again.</string>
+    <string name="share_weather_saved_downloads">Saved to Downloads</string>
+    <string name="share_weather_save_failed">Shared, but couldn\'t save to Downloads</string>
+    <string name="share_weather_chooser">Share weather</string>
+    <string name="share_weather_subject">Weather in %1$s</string>
+    <string name="share_weather_text">Here\'s the 7-day forecast for %1$s from AutoDroid.</string>
+    <string name="share_card_forecast_label">Next 7 days</string>
+    <string name="share_card_date_range">%1$s – %2$s</string>
+    <string name="share_card_hero_day">%1$s, %2$s</string>
+    <string name="share_card_hero_conditions">%1$s · low %2$d</string>
+    <string name="share_card_footer">AutoDroid · Weather data by Open-Meteo</string>
+
+    <string name="map_content_description">Map for choosing a city. Tap or long-press to select a location.</string>
+    <string name="map_attribution">© OpenStreetMap · © OpenFreeMap · Nominatim</string>
+    <string name="map_placeholder_label">Map</string>
+    <string name="map_resolving_location">Looking up that place…</string>
+
+    <string name="weather_clear">Clear sky</string>
+    <string name="weather_partly_cloudy">Partly cloudy</string>
+    <string name="weather_cloudy">Cloudy</string>
+    <string name="weather_fog">Fog</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_thunderstorm">Thunderstorm</string>
+
+    <string name="activity_skiing">Skiing</string>
+    <string name="activity_surfing">Surfing</string>
+    <string name="activity_outdoor_sightseeing">Outdoor</string>
+    <string name="activity_indoor_sightseeing">Indoor</string>
+
+    <string name="reason_surf_ideal">Around %1$d cm waves with %2$d km/h winds.</string>
+    <string name="reason_ski_ideal">%1$d°C with %2$d cm of fresh snow.</string>
+    <string name="reason_outdoor_mild">Comfortable %1$d°C and mostly dry — great for exploring.</string>
+    <string name="reason_indoor_bad_weather">A cosy pick when the weather turns.</string>
+    <string name="detail_wikipedia">Open Wikipedia</string>
 </resources>
+
