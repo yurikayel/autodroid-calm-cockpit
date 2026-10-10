@@ -3,8 +3,10 @@ import com.example.autodroid.feature.weather.ui.util.asUiText
 package com.example.autodroid.feature.weather.ui
 
 import com.example.autodroid.feature.weather.ui.util.asUiText
+import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
 import androidx.lifecycle.ViewModel
 import com.example.autodroid.feature.weather.ui.util.asUiText
+import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
 import androidx.lifecycle.ViewModelScope
 import com.example.autodroid.core.automotive.DrivingStateManager
 import com.example.autodroid.core.navigation.NavigationManager
@@ -505,6 +507,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 }
+
 
 
 
