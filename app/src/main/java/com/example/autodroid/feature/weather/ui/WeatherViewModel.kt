@@ -4,7 +4,7 @@ import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
 import com.example.autodroid.feature.weather.ui.util.asUiText
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelScope
+import androidx.lifecycle.viewModelScope
 import com.example.autodroid.core.automotive.DrivingStateManager
 import com.example.autodroid.core.navigation.NavigationManager
 import com.example.autodroid.core.navigation.Route
@@ -503,6 +503,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 }
+
 
 
 
