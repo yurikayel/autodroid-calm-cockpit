@@ -53,6 +53,11 @@ object CachePolicy {
         }
     }
 
+    fun isWeatherFresh(lastUpdated: Long, hasForecasts: Boolean, now: Long): Boolean {
+        if (!hasForecasts) return false
+        return now - lastUpdated < WEATHER_TTL_MS
+    }
+
     const val NEARBY_MIN_KM = 25.0
     const val NEARBY_RADIUS_KM = 280.0
     const val NEARBY_LIMIT = 4
