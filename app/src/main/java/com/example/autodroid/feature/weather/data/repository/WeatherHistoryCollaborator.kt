@@ -1,3 +1,4 @@
+import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
 package com.example.autodroid.feature.weather.data.repository
 
 import com.example.autodroid.feature.weather.data.local.dao.WeatherDao
@@ -90,7 +91,7 @@ class WeatherHistoryCollaborator @Inject constructor(
 
     suspend fun backfillCountryCode(locationId: Long, incoming: String?, existing: String?) {
         if (!existing.isNullOrBlank()) return
-        val code = incoming?.trim()?.uppercase()?.takeIf { it.isNotEmpty() } ?: return
+        val code = incoming.toIsoCountryCode() ?: return
         weatherDao.updateCountryCode(locationId, code)
     }
 
@@ -123,6 +124,7 @@ class WeatherHistoryCollaborator @Inject constructor(
         const val DEDUPE_FETCH_MULTIPLIER = 3
     }
 }
+
 
 
 

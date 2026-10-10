@@ -28,7 +28,7 @@ class WeatherForecastCollaborator @Inject constructor(
     private val placeImagePrefetcher: PlaceImagePrefetcher,
     private val weatherDao: WeatherDao,
     private val historyCollaborator: WeatherHistoryCollaborator,
-    private val clock: java.time.Clock
+    private val clock: Clock
 ) {
 
     suspend fun refreshForecast(location: Location, force: Boolean): AppResult<Unit> {
@@ -184,6 +184,7 @@ class WeatherForecastCollaborator @Inject constructor(
         waveHeightMax = waveHeightMax
     )
 }
+
 
 
 
