@@ -1,12 +1,9 @@
-import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
-import com.example.autodroid.feature.weather.ui.util.asUiText
 package com.example.autodroid.feature.weather.ui
 
-import com.example.autodroid.feature.weather.ui.util.asUiText
 import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
+import com.example.autodroid.feature.weather.ui.util.asUiText
+
 import androidx.lifecycle.ViewModel
-import com.example.autodroid.feature.weather.ui.util.asUiText
-import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
 import androidx.lifecycle.ViewModelScope
 import com.example.autodroid.core.automotive.DrivingStateManager
 import com.example.autodroid.core.navigation.NavigationManager
@@ -23,7 +20,6 @@ import com.example.autodroid.feature.weather.domain.util.ConnectivityStatus
 import com.example.autodroid.feature.weather.ui.map.MapCameraPosition
 import com.example.autodroid.feature.weather.ui.map.MapHopProfile
 import com.example.autodroid.feature.weather.ui.util.UiText
-import com.example.autodroid.feature.weather.ui.util.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.FlowPreview
@@ -507,6 +503,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 }
+
 
 
 
