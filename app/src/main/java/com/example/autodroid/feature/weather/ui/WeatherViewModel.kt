@@ -1,3 +1,4 @@
+import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
 import com.example.autodroid.feature.weather.ui.util.asUiText
 package com.example.autodroid.feature.weather.ui
 
@@ -44,7 +45,7 @@ import javax.inject.Inject
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class WeatherViewModel @Inject internal constructor(
+class WeatherViewModel @Inject constructor(
     private val repository: WeatherRepository,
     private val getRankedActivities: GetRankedActivitiesUseCase,
     private val getTopPicks: GetTopPicksUseCase,
@@ -342,14 +343,12 @@ class WeatherViewModel @Inject internal constructor(
             )
         }
     }
-
-    /** True when two locations share a case-insensitive name and country. */
     /**
      * Tap / long-press on the map: reverse-geocode then open the same detail flow as search.
      */
     fun onMapTapped(latitude: Double, longitude: Double) {
-        if (connectivityFlow.value != com.example.autodroid.feature.weather.domain.util.ConnectivityStatus.Available) {
-            _uiState.update { it.copy(mapTapFetch = FetchStatus.Failed(com.example.autodroid.feature.weather.domain.model.AppError.NetworkError.NoConnectivity.asUiText())) }
+        if (connectivityFlow.value != ConnectivityStatus.Available) {
+            _uiState.update { it.copy(mapTapFetch = FetchStatus.Failed(AppError.NetworkError.NoConnectivity.asUiText())) }
             return
         }
         startMapTap(latitude, longitude)
@@ -460,13 +459,8 @@ class WeatherViewModel @Inject internal constructor(
             }
         }
     }
-
-    /**
-     * Adds [extra] country-warm slots for [countryCode] and starts the sequential warmer if idle.
-     * Changing country resets the budget so a new GPS country does not mix queues.
-     */
-        private fun countryIsoFor(location: Location): String? {
-        val stored = location.countryCode?.trim()?.uppercase()?.takeIf { it.isNotEmpty() }
+    private fun countryIsoFor(location: Location): String? {
+        val stored = location.countryCode.toIsoCountryCode()
         return stored ?: countryCityCatalog.isoForCountryName(location.country)
     }
 
@@ -511,6 +505,10 @@ class WeatherViewModel @Inject internal constructor(
         }
     }
 }
+
+
+
+
 
 
 

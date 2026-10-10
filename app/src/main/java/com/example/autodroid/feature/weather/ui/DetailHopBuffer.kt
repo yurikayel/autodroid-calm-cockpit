@@ -44,10 +44,15 @@ class DetailHopBuffer {
         val ready = bufferedForecast?.takeIf {
             it.location.id == location.id || namesMatch(it.location, location)
         }
+        if (ready != null) {
+            bufferedForecast = null
+        }
         return ready
     }
 
     fun takeError(location: Location): UiText? {
+        val pending = pendingDetailLocation ?: return null
+        if (pending.id != location.id && !namesMatch(pending, location)) return null
         val error = bufferedError
         bufferedError = null
         return error
@@ -57,6 +62,3 @@ class DetailHopBuffer {
         a.name.equals(b.name, ignoreCase = true) &&
             a.country.equals(b.country, ignoreCase = true)
 }
-
-
-
