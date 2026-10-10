@@ -37,7 +37,7 @@ class WeatherRepositoryImpl @Inject constructor(
     private val countryCityCatalog: CountryCityCatalog,
     private val prefetchCollaborator: WeatherPrefetchCollaborator,
     private val routeCollaborator: RouteWeatherCollaborator,
-    private val clock: java.time.Clock
+    private val clock: Clock
 ) : WeatherRepository {
 
     override suspend fun searchCity(query: String): AppResult<List<Location>> {
@@ -117,6 +117,7 @@ class WeatherRepositoryImpl @Inject constructor(
         return routeCollaborator.getRouteWeather(route)
     }
 }
+
 
 
 

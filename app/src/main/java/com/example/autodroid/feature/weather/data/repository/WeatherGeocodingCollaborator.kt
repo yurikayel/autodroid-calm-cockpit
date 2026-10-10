@@ -1,3 +1,4 @@
+import com.example.autodroid.feature.weather.domain.util.toIsoCountryCode
 package com.example.autodroid.feature.weather.data.repository
 
 import com.example.autodroid.feature.weather.data.remote.GeocodingApi
@@ -29,7 +30,7 @@ class WeatherGeocodingCollaborator @Inject constructor(
                     elevation = dto.elevation,
                     population = dto.population,
                     featureCode = dto.featureCode,
-                    countryCode = dto.countryCode?.trim()?.uppercase()?.takeIf { it.isNotEmpty() }
+                    countryCode = dto.countryCode.toIsoCountryCode()
                 )
             } ?: emptyList()
             Result.Success(locations)
@@ -95,9 +96,10 @@ class WeatherGeocodingCollaborator @Inject constructor(
             longitude = lng,
             country = address?.country,
             admin1 = address?.state,
-            countryCode = address?.countryCode?.trim()?.uppercase()?.takeIf { it.isNotEmpty() }
+            countryCode = address?.countryCode.toIsoCountryCode()
         )
     }
 }
+
 
 
