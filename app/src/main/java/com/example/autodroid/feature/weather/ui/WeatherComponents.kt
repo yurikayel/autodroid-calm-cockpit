@@ -1,0 +1,457 @@
+package com.example.autodroid.feature.weather.ui
+
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.DownhillSkiing
+import androidx.compose.material.icons.outlined.Museum
+import androidx.compose.material.icons.outlined.Park
+import androidx.compose.material.icons.outlined.Surfing
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import coil.request.ImageRequest
+import com.example.autodroid.R
+import com.example.autodroid.feature.weather.data.preferences.ThemeMode
+import com.example.autodroid.feature.weather.domain.model.RecommendedActivity
+
+/** Maps an activity to its representative Material icon. Shared across home and detail. */
+internal fun activityIcon(activity: RecommendedActivity): ImageVector = when (activity) {
+    RecommendedActivity.OUTDOOR_SIGHTSEEING -> Icons.Outlined.Park
+    RecommendedActivity.INDOOR_SIGHTSEEING -> Icons.Outlined.Museum
+    RecommendedActivity.SURFING -> Icons.Outlined.Surfing
+    RecommendedActivity.SKIING -> Icons.Outlined.DownhillSkiing
+}
+
+/**
+ * Weight/size metrics shared by [DetailContent] and [PremiumShimmerLoadingState] so loading
+ * never flashes a different geometry (16:9 overlay hero + 7-day chips + compact activity rows).
+ *
+ * The locked 60% sheet keeps the hero on screen. When leftover height cannot fit the day row
+ * plus [ActivitySlots] minimum activity rows, the chips+list column scrolls.
+ */
+internal object DetailLayout {
+    const val ForecastDays = 7
+    const val ActivitySlots = 4
+    const val HeroAspectRatio = 16f / 9f
+    const val MinHeroFraction = 0.28f
+    val DayRowHeight = 128.dp
+    val MinActivityRowHeight = 44.dp
+    val BlockSpacing = 8.dp
+    val AfterDayRowSpacing = 8.dp
+    val DayButtonSpacing = 4.dp
+    val DayButtonCorner = 12.dp
+    val SheetHorizontalPadding = 8.dp
+    val SheetBottomPadding = 8.dp
+    val MinScrollBodyHeight = DayRowHeight + AfterDayRowSpacing +
+        MinActivityRowHeight * ActivitySlots
+}
+
+/**
+ * Hero height for a locked detail sheet. Uses 16:9 when leftover space can hold chips +
+ * minimum activity rows; otherwise shrinks the hero so the body can scroll instead of clip.
+ */
+internal fun detailHeroHeightPx(
+    sheetWidthPx: Float,
+    sheetHeightPx: Float,
+    minBodyPx: Float,
+    heroAspect: Float = DetailLayout.HeroAspectRatio,
+    minHeroFraction: Float = DetailLayout.MinHeroFraction
+): Float {
+    if (sheetWidthPx <= 0f || sheetHeightPx <= 0f) return 0f
+    val aspectHeight = sheetWidthPx / heroAspect
+    val leftoverFits = sheetHeightPx - aspectHeight >= minBodyPx
+    return if (leftoverFits) {
+        aspectHeight
+    } else {
+        (sheetHeightPx - minBodyPx).coerceAtLeast(sheetHeightPx * minHeroFraction)
+    }
+}
+
+/**
+ * Skeleton for the compact day-row + activity column under the overlay hero. Geometry matches
+ * [DetailContent]'s loaded body. The hero (including header overlay) is drawn by
+ * [DetailContent] itself so loading never drops the overlay chrome.
+ */
+@Composable
+internal fun PremiumShimmerLoadingState(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(DetailLayout.AfterDayRowSpacing)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(DetailLayout.DayButtonSpacing),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(DetailLayout.DayRowHeight)
+        ) {
+            repeat(DetailLayout.ForecastDays) {
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(DetailLayout.DayButtonCorner))
+                        .shimmerEffect()
+                )
+            }
+        }
+        Column(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            repeat(DetailLayout.ActivitySlots) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .clip(RoundedCornerShape(4.dp))
+                        .shimmerEffect()
+                )
+            }
+        }
+    }
+}
+
+/** A subtle pulsing background used for skeleton placeholders. */
+@Composable
+internal fun Modifier.shimmerEffect(): Modifier {
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val alpha by transition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 0.6f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(800, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "alpha"
+    )
+    return this.background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
+}
+
+/**
+ * City photo fill with Coil load/error states so a missing Wikimedia URL never looks like a blank bug.
+ * Shows shimmer while decoding, crops on success, and a tonal surface (+ optional initial) on miss/error.
+ */
+@Composable
+internal fun PlacePhotoBackdrop(
+    imageUrl: String?,
+    modifier: Modifier = Modifier,
+    cityInitial: String? = null,
+    showShimmerWhenNull: Boolean = false
+) {
+    when {
+        imageUrl != null -> {
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(imageUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = modifier.fillMaxSize()
+            ) {
+                when (painter.state) {
+                    is AsyncImagePainter.State.Loading,
+                    is AsyncImagePainter.State.Empty -> {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .shimmerEffect()
+                        )
+                    }
+                    is AsyncImagePainter.State.Error -> {
+                        PlacePhotoFallback(cityInitial = cityInitial, modifier = Modifier.fillMaxSize())
+                    }
+                    is AsyncImagePainter.State.Success -> {
+                        SubcomposeAsyncImageContent()
+                    }
+                }
+            }
+        }
+        showShimmerWhenNull -> {
+            Box(
+                modifier
+                    .fillMaxSize()
+                    .shimmerEffect()
+            )
+        }
+        else -> {
+            PlacePhotoFallback(cityInitial = cityInitial, modifier = modifier.fillMaxSize())
+        }
+    }
+}
+
+/** Tonal placeholder when Wikipedia/Coil cannot supply a city photo. */
+@Composable
+internal fun PlacePhotoFallback(
+    cityInitial: String?,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.background(MaterialTheme.colorScheme.surfaceContainerHighest),
+        contentAlignment = Alignment.Center
+    ) {
+        val initial = cityInitial
+            ?.trim()
+            ?.firstOrNull()
+            ?.uppercaseChar()
+            ?.toString()
+        if (initial != null) {
+            Text(
+                text = initial,
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f)
+            )
+        }
+    }
+}
+
+/** Rounded search field used on the home screen. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun CustomSearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    isSearching: Boolean,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = modifier,
+        enabled = enabled,
+        placeholder = {
+            Text(
+                stringResource(R.string.search_hint),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
+        },
+        leadingIcon = {
+            Icon(
+                Icons.Default.Search,
+                contentDescription = stringResource(R.string.search),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
+        trailingIcon = {
+            if (isSearching) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = stringResource(R.string.clear_search),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        },
+        singleLine = true,
+        shape = CircleShape,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = Color.Transparent,
+            focusedTextColor = MaterialTheme.colorScheme.onSurface,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+        )
+    )
+}
+
+
+
+/**
+ * First row of sheet chrome: city label + theme toggle on home; back, city, Wikipedia,
+ * share, and theme on detail. Home places this below the sheet edge. Detail overlays it on
+ * the city hero ([overlayOnHero]) so it does not consume a separate vertical block.
+ */
+@Composable
+internal fun WeatherSheetHeader(
+    title: String,
+    inDetail: Boolean,
+    canShare: Boolean,
+    shareInProgress: Boolean,
+    sheetFullyExpanded: Boolean,
+    onToggleTheme: () -> Unit,
+    onBack: () -> Unit,
+    onShare: () -> Unit,
+    searchQuery: String = "",
+    isSearching: Boolean = false,
+    searchEnabled: Boolean = true,
+    onQueryChange: (String) -> Unit = {},
+    wikipediaUrl: String? = null,
+    onOpenWikipedia: (String) -> Unit = {},
+    overlayOnHero: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    val contentColor = if (overlayOnHero) Color.White else LocalContentColor.current
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
+        Row(
+            modifier = modifier.then(
+                if (sheetFullyExpanded) Modifier.statusBarsPadding() else Modifier
+            ),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (inDetail) {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.detail_back)
+                        )
+                    }
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = contentColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                } else {
+                    CustomSearchBar(
+                        query = searchQuery,
+                        onQueryChange = onQueryChange,
+                        isSearching = isSearching,
+                        enabled = searchEnabled,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(end = 8.dp)
+                    )
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (inDetail) {
+                    IconButton(
+                        onClick = { wikipediaUrl?.let(onOpenWikipedia) },
+                        enabled = wikipediaUrl != null
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_wikipedia),
+                            contentDescription = stringResource(R.string.detail_wikipedia)
+                        )
+                    }
+                }
+                if (canShare) {
+                    IconButton(onClick = onShare, enabled = !shareInProgress) {
+                        Icon(
+                            Icons.Filled.Share,
+                            contentDescription = stringResource(R.string.share_weather)
+                        )
+                    }
+                }
+                ThemeToggleControl(
+                    themeMode = LocalThemeMode.current,
+                    onToggleTheme = onToggleTheme
+                )
+            }
+        }
+    }
+}
+
+/** Header control that advances Light → Dark → Cycle. Cycle shows a labeled pill. */
+@Composable
+private fun ThemeToggleControl(
+    themeMode: ThemeMode,
+    onToggleTheme: () -> Unit
+) {
+    if (themeMode == ThemeMode.CYCLE) {
+        CycleThemePill(onClick = onToggleTheme)
+        return
+    }
+    val isDark = themeMode == ThemeMode.DARK
+    val icon = if (isDark) Icons.Filled.DarkMode else Icons.Filled.LightMode
+    val descriptionRes = if (isDark) {
+        R.string.theme_switch_to_cycle
+    } else {
+        R.string.theme_switch_to_dark
+    }
+    IconButton(onClick = onToggleTheme) {
+        Icon(imageVector = icon, contentDescription = stringResource(descriptionRes))
+    }
+}
+
+/** Rounded CYCLE chip using Material 3 selected/on-surface colors and a primary outline. */
+@Composable
+private fun CycleThemePill(onClick: () -> Unit) {
+    val description = stringResource(R.string.theme_switch_to_light)
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(percent = 50),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        modifier = Modifier.semantics { contentDescription = description }
+    ) {
+        Text(
+            text = stringResource(R.string.theme_cycle_label),
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
