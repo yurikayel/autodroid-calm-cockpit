@@ -16,8 +16,8 @@ android {
         minSdk = 29
         targetSdk = 36
         // Robolectric 4.16 covers API 36; keep instrumented runner defaults.
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
