@@ -30,6 +30,12 @@ abstract class WeatherAppModule {
     companion object {
         @Provides
         @Singleton
+        fun provideClock(): java.time.Clock {
+            return java.time.Clock.systemDefaultZone()
+        }
+
+        @Provides
+        @Singleton
         fun provideConnectivityObserver(@ApplicationContext context: Context): ConnectivityObserver {
             return NetworkConnectivityObserver(context)
         }
