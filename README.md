@@ -118,3 +118,7 @@ From Drive, tap the orb or use simulation: *“what is the weather”*, *“weat
 - Offline cache-first stations (Room).
 - Cold start: baseline profile + `reportFullyDrawn` on an Automotive AVD (release).
 - Voice → vehicle controls with confirmation while moving.
+
+## Contributing
+
+This repository uses Gitflow (`feature/*` -> `develop` -> `main`). See [CONTRIBUTING.md](CONTRIBUTING.md) and the [architecture decision records](docs/adr/README.md).
