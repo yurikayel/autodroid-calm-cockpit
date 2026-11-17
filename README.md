@@ -30,6 +30,7 @@ Brand themes are fictional: **Northwind**, **Summit**, **Harbor**. Theme switchi
 | List / detail | Loading (`LoadingIndicator`), empty, error + Retry, detail ViewModel with assisted injection |
 | Navigation | Type-safe routes; suite scaffold + list-detail on large width |
 | Voice | Morphing orb by `VoiceState`; transcript capsule; SpeechRecognizer / TTS with simulation fallback |
+| Weather | Open-Meteo + MapLibre (migrated from WeatherRecommender); reached via voice, not a permanent nav tab |
 | Demo control | Debug-only bottom sheet (Normal / Empty / Error) |
 
 ## Architecture
@@ -107,9 +108,17 @@ Captured on `medium_phone` (`c:\project\autodroid-shots`):
 | `52-phone-drive-moving.png` | Phone focus — brand headline hidden |
 | `53-phone-radio-detail.png` | Phone station detail with Now playing chip |
 
+## Voice (weather demo)
+
+From Drive, tap the orb or use simulation: *“what is the weather”*, *“weather in Seattle”*, *“weather on the way”* (OSRM demo route → Portland). Long-press still runs the navigate-home demo phrase.
+
 ## Next steps
 
 - Real `CarPropertyManager` and `CarUxRestrictionsManager` adapters.
 - Offline cache-first stations (Room).
 - Cold start: baseline profile + `reportFullyDrawn` on an Automotive AVD (release).
 - Voice → vehicle controls with confirmation while moving.
+
+## Contributing
+
+This repository uses Gitflow (`feature/*` -> `develop` -> `main`). See [CONTRIBUTING.md](CONTRIBUTING.md) and the [architecture decision records](docs/adr/README.md).

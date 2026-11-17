@@ -1,6 +1,7 @@
 package com.example.autodroid.feature.dashboard
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
@@ -41,13 +42,23 @@ import com.example.autodroid.domain.model.VehicleState
 
 @Composable
 fun DashboardRoute(
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    onNavigateToWeather: () -> Unit
 ) {
     val vehicleState by viewModel.vehicleState.collectAsStateWithLifecycle()
     val isDriving by viewModel.isDriving.collectAsStateWithLifecycle()
     val voiceState by viewModel.voiceState.collectAsStateWithLifecycle()
     val transcript by viewModel.voiceTranscript.collectAsStateWithLifecycle()
     val nowPlaying by viewModel.nowPlaying.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.navEvents.collect { event ->
+            when (event) {
+                DashboardNavEvent.Weather,
+                DashboardNavEvent.WeatherRoute -> onNavigateToWeather()
+            }
+        }
+    }
 
     DriveScreen(
         vehicleState = vehicleState,

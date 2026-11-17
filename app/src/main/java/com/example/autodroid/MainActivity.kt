@@ -32,6 +32,7 @@ import com.example.autodroid.core.designsystem.isWideLayout
 import com.example.autodroid.feature.dashboard.DashboardRoute
 import com.example.autodroid.feature.radio.RadioDetailRoute
 import com.example.autodroid.feature.radio.RadioRoute
+import com.example.autodroid.feature.weather.ui.WeatherRoute
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
 import javax.inject.Inject
@@ -44,6 +45,9 @@ data object RadioDestination
 
 @Serializable
 data class RadioDetailDestination(val id: String)
+
+@Serializable
+data object WeatherDestination
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -78,7 +82,6 @@ fun MainAppNavigation(onCycleBrand: () -> Unit) {
     } == true
     val onDashboard = destination?.hasRoute(DashboardDestination::class) == true
 
-    // Car-first: rail when wide; bottom bar on phone.
     val layoutType = if (isWideLayout()) {
         NavigationSuiteType.NavigationRail
     } else {
@@ -133,7 +136,9 @@ fun MainAppNavigation(onCycleBrand: () -> Unit) {
             modifier = Modifier.fillMaxSize()
         ) {
             composable<DashboardDestination> {
-                DashboardRoute()
+                DashboardRoute(
+                    onNavigateToWeather = { navController.navigateToTab(WeatherDestination) }
+                )
             }
             composable<RadioDestination> {
                 RadioRoute(
@@ -145,6 +150,9 @@ fun MainAppNavigation(onCycleBrand: () -> Unit) {
                     stationId = entry.toRoute<RadioDetailDestination>().id,
                     onBack = { navController.popBackStack() }
                 )
+            }
+            composable<WeatherDestination> {
+                WeatherRoute()
             }
         }
     }
