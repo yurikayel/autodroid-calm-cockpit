@@ -26,7 +26,7 @@ class WeatherHistoryCollaboratorTest {
     }
 
     @Test
-    fun "rekey" - mergeViewedLocation prefers incoming positive ID over existing negative ID() = runTest {
+    fun `rekey - mergeViewedLocation prefers incoming positive ID over existing negative ID`() = runTest {
         val incoming = Location(id = 123L, name = "London", latitude = 51.5, longitude = -0.1, country = "GB", admin1 = null)
         val existingEntity = LocationEntity(id = -999L, name = "London", latitude = 51.5, longitude = -0.1, country = "GB", admin1 = null, countryCode = "GB", lastUpdated = 0L, lastViewedAt = 0L)
         
@@ -39,7 +39,7 @@ class WeatherHistoryCollaboratorTest {
     }
 
     @Test
-    fun "evict" - evictStaleLocationsIfNeeded removes unviewed then least recently viewed if over capacity() = runTest {
+    fun `evict - evictStaleLocationsIfNeeded removes unviewed then least recently viewed if over capacity`() = runTest {
         coEvery { weatherDao.getLocationCount() } returns 102
         coEvery { weatherDao.getUnviewedOldestIds(2) } returns listOf(1L)
         
@@ -53,13 +53,13 @@ class WeatherHistoryCollaboratorTest {
     }
 
     @Test
-    fun "backfill" - backfillCountryCode updates DAO if existing code is blank() = runTest {
+    fun `backfill - backfillCountryCode updates DAO if existing code is blank`() = runTest {
         collaborator.backfillCountryCode(10L, " GB ", null)
         coVerify(exactly = 1) { weatherDao.updateCountryCode(10L, "GB") }
     }
 
     @Test
-    fun "nome+pais" - findDuplicateLocation matches by name and country if proximity fails() = runTest {
+    fun `nome+pais - findDuplicateLocation matches by name and country if proximity fails`() = runTest {
         val location = Location(id = 1L, name = "London", latitude = 51.5, longitude = -0.1, country = "GB", admin1 = null)
         coEvery { weatherDao.findLocationsNear(any(), any(), any()) } returns emptyList()
         coEvery { weatherDao.findLocationsByNameAndCountry("London", "GB") } returns listOf(
